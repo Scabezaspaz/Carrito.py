@@ -1,0 +1,30 @@
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MYSQL_ROOT_PASSWORD: secret123
+      MYSQL_DATABASE: carrito_db
+      MYSQL_USER: carrito_user
+      MYSQL_PASSWORD: carrito_pass
+    volumes:
+      - datos-db:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: mysql+pymysql://carrito_user:carrito_pass@db:3306/carrito_db
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  datos-db:
