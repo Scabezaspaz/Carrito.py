@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  db-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ticketfast_test
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  api-test:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db-test:5432/ticketfast_test
+    ports:
+      - "8001:8000"
+    depends_on:
+      - db-test
